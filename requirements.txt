@@ -1,0 +1,9 @@
+djangorestframework
+PyJWT
+captcha
+django_ratelimit
+djangorestframework
+rest_framework_simplejwt
+djangorestframework-simplejwt
+django-simple-captcha
+django_redis
