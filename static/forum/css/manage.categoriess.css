@@ -1,0 +1,316 @@
+/* static/forum/css/admin.css */
+
+/* Variables et configuration de base */
+:root {
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --transition-speed: 0.2s;
+    --header-height: 64px;
+}
+
+/* Structure principale */
+.admin-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 60px);
+}
+
+/* Barre latérale */
+.admin-sidebar {
+    background: var(--discord-darker);
+    padding: 20px;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.admin-sidebar h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Navigation admin */
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-item {
+    padding: 12px 16px;
+    color: var(--discord-light);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.nav-item:hover, 
+.nav-item.active {
+    background: var(--discord-accent);
+    color: white;
+}
+
+/* Contenu principal */
+.admin-content {
+    background: var(--discord-darker);
+    padding: 20px;
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+.admin-header {
+    margin-bottom: 30px;
+}
+
+.admin-header h1 {
+    color: white;
+    font-size: 24px;
+}
+
+/* Grille de statistiques */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--discord-darkest);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card h3 {
+    color: var(--discord-accent);
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Sections admin */
+.admin-sections {
+    display: grid;
+    gap: 20px;
+}
+
+.section {
+    background: var(--discord-darkest);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.section h2 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    color: var(--discord-light);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+th {
+    color: white;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Boutons d'action */
+.btn-view, 
+.btn-delete,
+.btn-edit,
+.btn-add {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-view {
+    background: var(--discord-accent);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-delete {
+    background: #f04747;
+    color: white;
+}
+
+.btn-edit {
+    background: #faa61a;
+    color: white;
+}
+
+.btn-add {
+    background: #43b581;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #5b6eae;
+}
+
+.btn-delete:hover {
+    background: #d84444;
+}
+
+.btn-edit:hover {
+    background: #e69816;
+}
+
+.btn-add:hover {
+    background: #3ca374;
+}
+
+/* Formulaires */
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: var(--discord-light);
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px;
+    background: var(--discord-darkest);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--discord-light);
+}
+
+/* États de chargement et vides */
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--discord-light);
+}
+
+.empty-state h3 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.page-item {
+    padding: 8px 12px;
+    background: var(--discord-darkest);
+    border-radius: 4px;
+    color: var(--discord-light);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.page-item.active,
+.page-item:hover {
+    background: var(--discord-accent);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 10px;
+    }
+
+    .table-container {
+        font-size: 14px;
+    }
+
+    .btn-view, 
+    .btn-delete,
+    .btn-edit,
+    .btn-add {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+}

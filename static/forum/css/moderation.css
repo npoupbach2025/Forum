@@ -1,0 +1,542 @@
+/* Variables globales */
+:root {
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --transition-speed: 0.2s;
+}
+
+/* Structure principale */
+.mod-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 60px);
+}
+
+/* Sidebar */
+.mod-sidebar {
+    background: var(--discord-darker);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mod-sidebar h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mod-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-link {
+    padding: 12px 16px;
+    color: var(--discord-light);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-speed);
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+    background: var(--discord-accent);
+    color: white;
+}
+
+/* Contenu principal */
+.mod-content {
+    background: var(--discord-darker);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête de contenu */
+.content-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.content-header h1 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Barre d'outils */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-md);
+}
+
+/* Barre de recherche */
+.search-section {
+    flex: 1;
+    max-width: 300px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    background: var(--discord-darkest);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--discord-light);
+}
+
+/* Filtres */
+.filters-bar {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: var(--discord-darkest);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--discord-light);
+    cursor: pointer;
+    transition: background var(--transition-speed);
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.filter-btn.active {
+    background: var(--discord-accent);
+    color: white;
+}
+
+/* Grille de statistiques */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.stat-card {
+    background: var(--discord-darkest);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.stat-card h3 {
+    color: var(--discord-accent);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+}
+
+th {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--discord-light);
+    font-weight: 600;
+}
+
+td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--discord-light);
+}
+
+/* Cellules avec avatar */
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.username {
+    color: white;
+    font-weight: 500;
+}
+
+.user-id {
+    color: var(--discord-accent);
+    font-size: 12px;
+}
+
+/* Badges et statuts */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: rgba(59, 165, 93, 0.1);
+    color: #3ba55d;
+}
+
+.status-badge.warning {
+    background: rgba(250, 166, 26, 0.1);
+    color: #faa61a;
+}
+
+.status-badge.danger {
+    background: rgba(237, 66, 69, 0.1);
+    color: #ed4245;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+    margin-right: 8px;
+    min-width: 100px; /* Définit une largeur minimale fixe */
+    text-align: center;
+}
+.btn-primary {
+    background: var(--discord-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4752c4;
+}
+
+.btn-danger {
+    background: #ed4245;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #d83c3e;
+}
+
+/* Liste d'activité */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.activity-item {
+    background: var(--discord-darkest);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    color: var(--discord-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* État vide */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--discord-light);
+}
+
+.empty-icon {
+    width: 120px;
+    height: 120px;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--discord-darker);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: var(--spacing-md);
+    top: var(--spacing-md);
+    cursor: pointer;
+    color: var(--discord-light);
+    font-size: 24px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .mod-container {
+        grid-template-columns: 1fr;
+    }
+
+    .mod-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .action-bar {
+        flex-direction: column;
+    }
+
+    .search-section {
+        max-width: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .mod-container {
+        padding: var(--spacing-sm);
+    }
+
+    .mod-content {
+        padding: var(--spacing-sm);
+    }
+
+    td:nth-child(3),
+    th:nth-child(3) {
+        display: none;
+    }
+}
+
+
+.view-btn {
+    background-color: var(--discord-accent);
+    color: white;
+}
+
+.view-btn:hover {
+    background-color: #5b6eae;
+}
+
+/* Bouton Fermer */
+.close-btn {
+    background-color: #faa61a;
+    color: white;
+}
+
+.close-btn:hover {
+    background-color: #e69816;
+}
+
+/* Bouton Supprimer */
+.delete-btn {
+    background-color: #ed4245;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #d83c3e;
+}
+
+/* Styles pour les signalements */
+.reports-list {
+    padding: 20px;
+}
+
+.report-card {
+    background-color: var(--discord-dark);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-card.pending {
+    border-left: 4px solid #ffd700;
+}
+
+.report-card.resolved {
+    border-left: 4px solid #4CAF50;
+}
+
+.report-card.dismissed {
+    border-left: 4px solid #f44336;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.report-header h3 {
+    margin: 0;
+    color: var(--text-normal);
+}
+
+.report-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.report-status.pending {
+    background-color: #ffd700;
+    color: #000;
+}
+
+.report-status.resolved {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.report-status.dismissed {
+    background-color: #f44336;
+    color: #fff;
+}
+
+.report-details {
+    margin-bottom: 15px;
+}
+
+.report-details p {
+    margin: 8px 0;
+    color: var(--text-muted);
+}
+
+.report-details strong {
+    color: var(--text-normal);
+}
+
+.report-details a {
+    color: var(--link);
+    text-decoration: none;
+}
+
+.report-details a:hover {
+    text-decoration: underline;
+}
+
+.report-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.report-actions .btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.btn-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn i {
+    font-size: 0.9em;
+}
+
+.no-reports {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+.no-reports i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #4CAF50;
+}
+
+.filters-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.filter-select {
+    padding: 8px;
+    border-radius: 4px;
+    background-color: var(--discord-dark);
+    color: var(--text-normal);
+    border: 1px solid var(--discord-darker);
+}
+
+.inline-form {
+    display: inline-block;
+}

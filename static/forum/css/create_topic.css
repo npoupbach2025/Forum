@@ -1,0 +1,253 @@
+/* Variables communes */
+:root {
+    --container-width: 800px;
+    --border-radius: 8px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --input-height: 42px;
+}
+
+/* Styles communs aux deux pages */
+.public-forum-container,
+.private-forum-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.forum-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.forum-header h1 {
+    font-size: 24px;
+    color: var(--discord-light);
+    margin-bottom: var(--spacing-sm);
+}
+
+.forum-header .subtitle {
+    color: var(--discord-accent);
+    font-size: 14px;
+}
+
+.create-forum-form {
+    background: var(--discord-darker);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    color: var(--discord-light);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Input groups */
+.input-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.input-group label {
+    display: block;
+    color: var(--discord-light);
+    margin-bottom: var(--spacing-sm);
+    font-size: 14px;
+}
+
+.input-group input[type="text"],
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    background: var(--discord-darkest);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--discord-light);
+    font-size: 14px;
+}
+
+.input-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* Options de formulaire */
+.options-group {
+    background: var(--discord-darkest);
+    padding: var(--spacing-md);
+    border-radius: 4px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.option-item:last-child {
+    margin-bottom: 0;
+}
+
+.option-item input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+}
+
+.option-item label {
+    color: var(--discord-light);
+    font-size: 14px;
+}
+
+/* Liste d'amis (pour le formulaire privé) */
+.friends-list {
+    background: var(--discord-darkest);
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.friend-item {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s;
+}
+
+.friend-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.friend-item:last-child {
+    border-bottom: none;
+}
+
+.friend-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    cursor: pointer;
+}
+
+.friend-avatar {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 6px;
+}
+
+.friend-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-name {
+    color: var(--discord-light);
+    font-size: 14px;
+}
+
+.friend-id {
+    color: var(--discord-accent);
+    font-size: 12px;
+}
+
+/* Message pas d'amis */
+.no-friends {
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--discord-light);
+}
+
+.add-friend-btn {
+    display: inline-block;
+    margin-top: var(--spacing-md);
+    padding: 8px 16px;
+    background: var(--discord-accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Boutons d'action */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background: var(--discord-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5b6eae;
+}
+
+.btn-secondary {
+    background: var(--discord-darker);
+    color: var(--discord-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background: #2c2f33;
+}
+
+/* Scrollbar personnalisée */
+.friends-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.friends-list::-webkit-scrollbar-track {
+    background: var(--discord-darkest);
+}
+
+.friends-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.friends-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .public-forum-container,
+    .private-forum-container {
+        padding: var(--spacing-md);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,181 @@
+/* Conteneur principal */
+.private-forum-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* En-tête */
+.forum-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.forum-header h1 {
+    color: #fff;
+    font-size: 24px;
+}
+
+/* Formulaire */
+.create-forum-form {
+    background: var(--discord-darker);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h2 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* Groupes de champs */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #dcddde;
+    margin-bottom: 8px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    background: var(--discord-darkest);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+}
+
+/* Liste des amis */
+.friends-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.friend-item {
+    position: relative;
+}
+
+.friend-item input[type="checkbox"] {
+    display: none;
+}
+
+.friend-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--discord-darkest);
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.friend-item input[type="checkbox"]:checked + .friend-label {
+    border-color: #5865F2;
+    background: rgba(88, 101, 242, 0.1);
+}
+
+.friend-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.friend-info {
+    flex: 1;
+}
+
+.friend-name {
+    display: block;
+    color: #fff;
+    font-size: 14px;
+}
+
+.friend-id {
+    display: block;
+    color: #72767d;
+    font-size: 12px;
+}
+
+/* Message pas d'amis */
+.no-friends {
+    text-align: center;
+    padding: 30px;
+    color: #72767d;
+}
+
+.add-friend-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #5865F2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.add-friend-btn:hover {
+    background: #4752C4;
+}
+
+/* Actions du formulaire */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background: #5865F2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4752C4;
+}
+
+.btn-secondary {
+    background: #4f545c;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5d6269;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .friends-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
