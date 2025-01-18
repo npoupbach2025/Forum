@@ -1,0 +1,248 @@
+{% extends 'forum/base.html' %} 
+{% load static %}
+{% block content %}
+
+<div class="forum-category">
+    <div class="category-header">
+        <div class="category-info">
+            <h1>{{ category.name }}</h1>
+            <div class="category-stats">
+                <span class="stat">{{ stats.total_posts }} discussions</span>
+                <span class="stat">{{ stats.total_members }} membres</span>
+                <span class="stat">{{ stats.active_discussions }} actifs cette semaine</span>
+            </div>
+        </div>
+        {% if can_create_topic %}
+        <div class="topic-buttons">
+            <a href="{% url 'forum:create_topic' %}?category={{ category.name }}" class="new-topic-btn">
+                <i class="fas fa-plus"></i> Nouvelle Discussion
+            </a>
+            <a href="{% url 'forum:create_private_topic' %}" class="new-topic-btn private">
+                Discussion Privée
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="category-content">
+        <div class="filters">
+            <div class="filter-group">
+                <a href="?filter=recent" class="filter-btn {% if current_filter == 'recent' %}active{% endif %}">Récents</a>
+                <a href="?filter=popular" class="filter-btn {% if current_filter == 'popular' %}active{% endif %}">Populaires</a>
+            </div>
+        </div>
+
+        <div class="topics-list">
+            {% if posts %}
+                {% for post in posts %}
+                    <div class="topic-card">
+                        <a href="{% url 'forum:topic_view' post.id %}" class="topic-link">
+                            <div class="topic-header">
+                                <div class="author-info">
+                                    <img src="{% static 'forum/img/default_avatar.svg' %}" alt="Avatar" class="author-avatar">
+                                    <div class="post-meta">
+                                        <h3>{{ post.title }}</h3>
+                                        <div class="author-details">
+                                            <span class="author-name">{{ post.author.username }}</span>
+                                            <span class="post-date">{{ post.created_at|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="topic-stats">
+                                    <span class="views">
+                                        <i class="fas fa-eye"></i>
+                                        {{ post.views }} vues
+                                    </span>
+                                    <span class="comments">
+                                        <i class="fas fa-comment"></i>
+                                        {{ post.comments.count }} réponses
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="topic-preview">
+                                {{ post.content|truncatewords:50 }}
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-message">
+                        <h2>Aucune discussion pour le moment</h2>
+                        <p>Soyez le premier à créer une discussion dans cette catégorie !</p>
+                        {% if can_create_topic %}
+                        <button class="new-topic-btn" onclick="showForm('public')">Créer une discussion</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Modal unique pour les deux types de forums -->
+        <div id="newTopicModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                
+                <div id="publicForumForm">
+                    <h2>Créer un forum public</h2>
+                    <form id="createTopicForm" action="{% url 'forum:create_category_topic' category.name %}" method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="title" placeholder="Titre du forum" required>
+                            <div class="input-group">
+                                <textarea name="content" placeholder="Contenu de la discussion" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Créer le forum public</button>
+                    </form>
+                </div>
+
+                <div id="privateForumForm" style="display: none;">
+                    <h2>Créer un forum privé</h2>
+                    <form action="{% url 'forum:create_topic' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="title" placeholder="Titre du forum" required>
+                        </div>
+                        <div class="input-group">
+                            <select name="friend" required>
+                                <option value="">Sélectionner un ami</option>
+                                {% for friend in user.profile.friends.all %}
+                                    <option value="{{ friend.id }}">{{ friend.user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Créer le forum privé</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-sidebar">
+        <div class="sidebar-section">
+            <h3>Modérateurs</h3>
+            <div class="moderators-list">
+                {% for moderator in stats.moderators %}
+                <div class="moderator">
+                    <img src="{% static 'forum/img/default_avatar.svg' %}" alt="Modérateur">
+                    <span>{{ moderator.username }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Discussions Populaires</h3>
+            <div class="popular-topics">
+                {% for post in popular_posts %}
+                <div class="popular-topic">
+                    <h4>{{ post.title }}</h4>
+                    <div class="topic-meta">
+                        <span>{{ post.comments.count }} réponses</span>
+                        <span>{{ post.views }} vues</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'forum/js/notifications.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const createTopicForm = document.getElementById('createTopicForm');
+    if (createTopicForm) {
+        createTopicForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Déclencher la notification
+                    if (data.notification && data.notification.type === 'new_topic') {
+                        window.notificationManager.showTopicNotification(
+                            data.notification.topic_title,
+                            data.notification.author
+                        );
+                    }
+                    
+                    // Rediriger vers la catégorie après un court délai pour permettre à la notification de s'afficher
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                } else {
+                    alert(data.error || 'Une erreur est survenue');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la création de la discussion');
+            }
+        });
+    }
+
+    // Gérer la soumission des commentaires
+    const commentForms = document.querySelectorAll('form[action*="add_comment"]');
+    commentForms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Déclencher la notification
+                    if (data.notification && data.notification.type === 'new_comment') {
+                        window.notificationManager.showCommentNotification(
+                            data.notification.topic_title,
+                            data.notification.author
+                        );
+                    }
+                    
+                    // Vider le champ de commentaire
+                    this.reset();
+                    
+                    // Recharger les commentaires
+                    location.reload();
+                } else {
+                    alert(data.error || 'Une erreur est survenue');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de l\'ajout du commentaire');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

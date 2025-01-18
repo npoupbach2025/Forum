@@ -1,0 +1,59 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/create_topic.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="public-forum-container">
+    <div class="forum-header">
+        <h1>Nouvelle discussion publique</h1>
+        <p class="subtitle">Créez une discussion visible par tous les utilisateurs</p>
+    </div>
+
+    <div class="create-forum-form">
+        <form method="POST" action="{% url 'forum:create_category_topic' category %}">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h2>Informations générales</h2>
+                <div class="input-group">
+                    <label for="title">Titre de la discussion</label>
+                    <input type="text" 
+                           id="title" 
+                           name="title" 
+                           required 
+                           placeholder="Donnez un titre à votre discussion">
+                </div>
+
+                <div class="input-group">
+                    <label for="content">Contenu</label>
+                    <textarea id="content" 
+                             name="content" 
+                             rows="10" 
+                             required 
+                             placeholder="Rédigez votre message ici..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Options</h2>
+                <div class="options-group">
+                    <div class="option-item">
+                        <input type="checkbox" id="notify" name="notify">
+                        <label for="notify">Recevoir les notifications de réponses</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="history.back()">Annuler</button>
+                <button type="submit" class="btn-primary">Créer la discussion</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

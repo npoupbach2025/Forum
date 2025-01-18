@@ -1,0 +1,23 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+<div class="topics-list">
+    <h2>Toutes les discussions</h2>
+    <div class="topics-container">
+        {% for topic in topics %}
+        <div class="topic-card">
+            <div class="topic-header">
+                <h3><a href="{% url 'forum:topic_view' topic.id %}">{{ topic.title }}</a></h3>
+                <span class="topic-author">par {{ topic.author.username }}</span>
+            </div>
+            <div class="topic-meta">
+                <span class="topic-date">{{ topic.created_at|date:"d/m/Y H:i" }}</span>
+                <span class="topic-comments">{{ topic.comment_set.count }} réponses</span>
+            </div>
+        </div>
+        {% empty %}
+        <p>Aucune discussion pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

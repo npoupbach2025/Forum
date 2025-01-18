@@ -1,0 +1,22 @@
+<div class="chat-header">
+    <h2>{{ topic.title }}</h2>
+    <p>Discussion avec {{ topic.with_friend.user.username }}</p>
+</div>
+
+<div class="chat-messages">
+    {% for message in messages %}
+        <div class="message {% if message.author == request.user %}sent{% else %}received{% endif %}">
+            <div class="message-content">
+                {{ message.content }}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="chat-input">
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="content" placeholder="Votre message...">
+        <button type="submit">Envoyer</button>
+    </form>
+</div>

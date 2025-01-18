@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Forum</title>
+    <link rel="stylesheet" href="{% static 'forum/css/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Bienvenue !</h1>
+            
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="post" action="{% url 'forum:login' %}" class="login-form">
+                {% csrf_token %}
+
+                <div class="input-group">
+                    <input type="text" id="username" name="username" required>
+                    <label for="username">Nom d'utilisateur</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" name="password" required>
+                    <label for="password">Mot de passe</label>
+                </div>
+
+                <!-- Section CAPTCHA -->
+                {% if form.requires_captcha %}
+                <div class="captcha-group">
+                    {{ form.captcha }}
+                    {% if form.captcha.errors %}
+                    <div class="error-message">
+                        {{ form.captcha.errors }}
+                    </div>
+                    {% endif %}
+                    <div class="captcha-help">
+                        Veuillez saisir le texte affiché dans l'image ci-dessus
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="login-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember_me">
+                        Se souvenir de moi
+                    </label>
+                    <a href="{% url 'forum:password_reset' %}" class="forgot-password">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit" class="login-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Se connecter
+                </button>
+            </form>
+
+            <div class="register-link">
+                Besoin d'un compte ? <a href="{% url 'forum:register' %}">S'inscrire</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'forum/js/login.js' %}"></script>
+</body>
+</html>

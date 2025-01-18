@@ -1,0 +1,101 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/register.css' %}">
+{% endblock %}
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <h1>Créer un compte</h1>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'forum:register' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required minlength="3" pattern="[A-Za-z0-9_-]+" title="Lettres, chiffres, tirets et underscores uniquement">
+                <small class="help-text">
+                    Au moins 3 caractères, uniquement lettres, chiffres, tirets et underscores.
+                </small>
+            </div>
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required minlength="8">
+                <small class="help-text">
+                    Au moins 8 caractères, avec des lettres, des chiffres et des caractères spéciaux.
+                </small>
+            </div>
+            <div class="input-group">
+                <label for="confirm_password">Confirmer le mot de passe</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="8">
+            </div>
+            <button type="submit">S'inscrire</button>
+        </form>
+        
+        <div class="login-link">
+            Déjà un compte ? <a href="{% url 'forum:login' %}">Se connecter</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.alert-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.help-text {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 4px;
+    display: block;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.input-group input:focus {
+    border-color: #2196f3;
+    outline: none;
+}
+</style>
+{% endblock %}

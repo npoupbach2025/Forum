@@ -1,0 +1,83 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/rules.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="rules-container">
+    <div class="rules-header">
+        <h1>Règles et Guidelines du Forum</h1>
+        <p>Pour maintenir une communauté saine et respectueuse, veuillez suivre ces règles</p>
+    </div>
+
+    <div class="rules-section">
+        <h2>1. Comportement Général</h2>
+        
+        <div class="rule-item">
+            <h3>Respect Mutuel</h3>
+            <p>Traitez tous les membres avec respect, indépendamment de leurs opinions, origines ou niveau d'expertise.</p>
+        </div>
+
+        <div class="rule-item">
+            <h3>Langage Approprié</h3>
+            <p>Évitez les insultes, le langage offensant et toute forme de harcèlement. Les débats constructifs sont encouragés, l'agressivité ne l'est pas.</p>
+        </div>
+
+        <div class="warning-box">
+            Tout comportement toxique ou irrespectueux entraînera des sanctions immédiates.
+        </div>
+    </div>
+
+    <div class="rules-section">
+        <h2>2. Contenu des Messages</h2>
+        
+        <div class="rule-item">
+            <h3>Qualité des Contributions</h3>
+            <p>Veillez à rédiger des messages clairs et constructifs. Évitez le spam et les messages sans contenu pertinent.</p>
+        </div>
+
+        <div class="rule-item">
+            <h3>Contenu Interdit</h3>
+            <p>Sont strictement interdits : le contenu NSFW, la désinformation, les propos discriminatoires, et la promotion de produits ou services non autorisés.</p>
+        </div>
+
+        <div class="info-box">
+            En cas de doute sur le contenu à poster, contactez un modérateur pour validation.
+        </div>
+    </div>
+
+    <div class="rules-section">
+        <h2>3. Organisation des Discussions</h2>
+        
+        <div class="rule-item">
+            <h3>Catégories Appropriées</h3>
+            <p>Créez vos sujets dans les catégories appropriées pour faciliter la navigation et la recherche d'information.</p>
+        </div>
+
+        <div class="rule-item">
+            <h3>Titres Descriptifs</h3>
+            <p>Utilisez des titres clairs et descriptifs pour vos discussions. Évitez les titres vagues comme "Aidez-moi" ou "Question".</p>
+        </div>
+    </div>
+
+    <div class="rules-section">
+        <h2>4. Modération et Sanctions</h2>
+        
+        <div class="rule-item">
+            <h3>Décisions de Modération</h3>
+            <p>Les décisions des modérateurs sont finales. En cas de désaccord, utilisez la messagerie privée pour en discuter respectueusement.</p>
+        </div>
+
+        <div class="rule-item">
+            <h3>Système de Sanctions</h3>
+            <p>Les infractions peuvent entraîner des avertissements, des suspensions temporaires ou des bannissements définitifs selon la gravité.</p>
+        </div>
+
+        <div class="warning-box">
+            La création de comptes multiples pour contourner une sanction entraînera un bannissement définitif.
+        </div>
+    </div>
+</div>
+{% endblock %}

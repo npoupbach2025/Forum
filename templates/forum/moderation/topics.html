@@ -1,0 +1,102 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/moderation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mod-container">
+    <div class="mod-sidebar">
+        <h2>Modération</h2>
+        <nav class="mod-nav">
+            <a href="{% url 'forum:admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Tableau de bord
+            </a>
+            <a href="{% url 'forum:mod_users' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_users' %}active{% endif %}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{% url 'forum:mod_topics' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_topics' %}active{% endif %}">
+                <i class="fas fa-comments"></i> Discussions
+            </a>
+            <a href="{% url 'forum:mod_reports' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_reports' %}active{% endif %}">
+                <i class="fas fa-flag"></i> Signalements
+            </a>
+        </nav>
+    </div>
+
+    <div class="mod-content">
+        <div class="content-header">
+            <h1>Gestion des Discussions</h1>
+            <div class="action-bar">
+                <div class="search-section">
+                    <input type="text" id="topicSearch" placeholder="Rechercher une discussion..." class="search-input">
+                </div>
+                <div class="filter-section">
+                    <select id="topicFilter" class="filter-select">
+                        <option value="all">Tous les sujets</option>
+                        <option value="reported">Signalés</option>
+                        <option value="pinned">Épinglés</option>
+                        <option value="closed">Fermés</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="topics-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>Catégorie</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for topic in topics %}
+                    <tr>
+                        <td class="topic-title">{{ topic.title }}</td>
+                        <td class="topic-author">{{ topic.author.username }}</td>
+                        <td class="topic-category">{{ topic.category.name|default:"Sans catégorie" }}</td>
+                        <td class="topic-date">{{ topic.created_at|date:"d/m/Y H:i" }}</td>
+                        <td class="topic-status">
+                            <span class="status-badge {% if topic.is_closed %}closed{% elif topic.is_pinned %}pinned{% else %}active{% endif %}">
+                                {% if topic.is_closed %}Fermé
+                                {% elif topic.is_pinned %}Épinglé
+                                {% else %}Actif
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="topic-actions">
+                            <a href="{% url 'forum:topic_view' topic.id %}" class="action-btn view-btn">Voir</a>
+                            {% if not topic.is_closed %}
+                            <form method="POST" action="{% url 'forum:moderate_topic' topic.id %}" class="inline-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="close">
+                                <button type="submit" class="action-btn close-btn">Fermer</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{% url 'forum:moderate_topic' topic.id %}" class="inline-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="action-btn delete-btn" 
+                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette discussion ?')">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-state">Aucune discussion trouvée</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

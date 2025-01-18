@@ -1,0 +1,57 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/moderation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mod-container">
+    <div class="mod-sidebar">
+        <h2>Modération</h2>
+        <nav class="mod-nav">
+            <a href="{% url 'forum:admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Tableau de bord
+            </a>
+            <a href="{% url 'forum:mod_users' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_users' %}active{% endif %}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{% url 'forum:mod_topics' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_topics' %}active{% endif %}">
+                <i class="fas fa-comments"></i> Discussions
+            </a>
+            <a href="{% url 'forum:mod_reports' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_reports' %}active{% endif %}">
+                <i class="fas fa-flag"></i> Signalements
+            </a>
+        </nav>
+    </div>
+    
+    <div class="mod-content">
+        <h1>Tableau de bord modération</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total utilisateurs</h3>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total discussions</h3>
+                <div class="stat-value">{{ total_topics }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total commentaires</h3>
+                <div class="stat-value">{{ total_comments }}</div>
+            </div>
+        </div>
+        
+        <div class="recent-activity">
+            <h2>Activité récente</h2>
+            {% for topic in recent_topics %}
+            <div class="activity-item">
+                <p>{{ topic.title }} par {{ topic.author.username }}</p>
+                <span>{{ topic.created_at|timesince }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

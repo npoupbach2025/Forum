@@ -1,0 +1,21 @@
+{% extends 'forum/base.html' %}
+
+{% block content %}
+<div class="members-list">
+    <h2>Liste des membres</h2>
+    <div class="members-grid">
+        {% for member in members %}
+        <div class="member-card">
+            <img src="{% if member.profile.avatar %}{{ member.profile.avatar.url }}{% else %}{% static 'forum/img/avatar.png' %}{% endif %}" alt="Avatar" class="member-avatar">
+            <div class="member-info">
+                <h3>{{ member.username }}</h3>
+                <span class="member-id">#{{ member.profile.forum_id }}</span>
+                <span class="member-joined">Inscrit le {{ member.date_joined|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <p>Aucun membre inscrit pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

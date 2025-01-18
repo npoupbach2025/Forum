@@ -1,0 +1,172 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/topic.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="discussion-container">
+    <!-- En-tête du channel -->
+    <div class="channel-header">
+        <div class="channel-info">
+            <div class="channel-name">
+                <i class="fas fa-hashtag"></i>
+                {{ topic.title }}
+            </div>
+            <div class="channel-details">
+                {{ topic.category.name }} • Créé le {{ topic.created_at|date:"d/m/Y H:i" }}
+            </div>
+        </div>
+        <div class="channel-stats">
+            <span class="stats-item">
+                <i class="fas fa-eye"></i> {{ topic.views }} vues
+            </span>
+            <span class="stats-item">
+                <i class="fas fa-comment"></i> {{ comments.count }} messages
+            </span>
+            <button type="button" class="report-btn {% if topic in user.reported_topics.all %}reported{% endif %}" 
+                    onclick="openReportModal()"
+                    data-topic-id="{{ topic.id }}" 
+                    {% if topic in user.reported_topics.all %}disabled{% endif %}>
+                <i class="fas fa-flag"></i>
+                {% if topic in user.reported_topics.all %}
+                    Signalé
+                {% else %}
+                    Signaler
+                {% endif %}
+            </button>
+            {% if user == topic.author or user.is_staff %}
+            <button type="button" class="edit-btn" data-action="edit">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="delete-btn" data-action="delete">
+                <i class="fas fa-trash"></i>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Zone des messages -->
+    <div class="messages-scroll">
+        <div class="messages-list" id="messagesList">
+            <!-- Message initial -->
+            <div class="message-group">
+                <div class="message">
+                    <div class="message-avatar">
+                        <img src="{% static 'forum/img/avatar.png' %}" alt="Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">{{ topic.author.username }}</span>
+                            <span class="message-timestamp">{{ topic.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="message-text" data-topic-id="{{ topic.id }}">
+                            {{ topic.content }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages de réponse -->
+            {% for comment in comments %}
+            <div class="message-group" data-message-id="{{ comment.id }}">
+                <div class="message">
+                    <div class="message-avatar">
+                        <img src="{% static 'forum/img/avatar.png' %}" alt="Avatar">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">{{ comment.author.username }}</span>
+                            <span class="message-timestamp">{{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                            {% if user == comment.author or user.is_staff %}
+                            <div class="message-actions">
+                                <button type="button" class="action-btn edit" data-action="edit-comment" data-comment-id="{{ comment.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="action-btn delete" data-action="delete-comment" data-comment-id="{{ comment.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="message-text">
+                            {{ comment.content }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Zone de saisie -->
+    <div class="message-input">
+        <form method="POST" action="{% url 'forum:reply_topic' topic.id %}" class="input-form">
+            {% csrf_token %}
+            <div class="input-wrapper">
+                <input type="text" name="content" placeholder="Envoyer un message" required>
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal de signalement -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReportModal()">&times;</span>
+            <h2>Signaler la discussion</h2>
+            
+            <form method="POST" action="{% url 'forum:report_topic' topic.id %}" id="reportForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reason">Raison du signalement :</label>
+                    <select name="reason" id="reason" required>
+                        <option value="">Sélectionnez une raison</option>
+                        <option value="spam">Spam</option>
+                        <option value="inappropriate">Contenu inapproprié</option>
+                        <option value="harassment">Harcèlement</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="details">Détails (optionnel) :</label>
+                    <textarea name="details" id="details" rows="4"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="closeReportModal()" class="btn-secondary">Annuler</button>
+                    <button type="submit" class="btn-primary">Envoyer le signalement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal d'édition -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Modifier le message</h2>
+                <button type="button" class="close" data-action="close">&times;</button>
+            </div>
+            <form method="POST" class="edit-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="content" rows="4" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" data-action="close">Annuler</button>
+                    <button type="submit" class="btn-primary">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'forum/js/topic.js' %}"></script>
+{% endblock %}

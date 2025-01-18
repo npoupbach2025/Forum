@@ -1,0 +1,70 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/create_topic.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="private-forum-container">
+    <div class="forum-header">
+        <h1>Nouvelle discussion privée</h1>
+        <p class="subtitle">Créez une discussion avec vos amis</p>
+    </div>
+
+    <div class="create-forum-form">
+        <form method="POST" action="{% url 'forum:create_topic' %}">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h2>Informations</h2>
+                <div class="input-group">
+                    <label for="forum-name">Titre de la discussion</label>
+                    <input type="text" 
+                           id="forum-name" 
+                           name="title" 
+                           required 
+                           placeholder="Donnez un titre à votre discussion">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Participants</h2>
+                <div class="friends-list">
+                    {% if user.profile.friends.all %}
+                        {% for friend in user.profile.friends.all %}
+                        <div class="friend-item">
+                            <input type="checkbox"
+                                   id="friend-{{ friend.id }}"
+                                   name="friends[]"
+                                   value="{{ friend.id }}">
+                            <label for="friend-{{ friend.id }}" class="friend-label">
+                                <img src="{% static 'forum/img/default_avatar.svg' %}"
+                                     alt="Avatar"
+                                     class="friend-avatar">
+                                <div class="friend-info">
+                                    <span class="friend-name">{{ friend.user.username }}</span>
+                                    <span class="friend-id">#{{ friend.forum_id }}</span>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-friends">
+                            <p>Vous n'avez pas encore d'amis.</p>
+                            <a href="#" class="add-friend-btn">Ajouter des amis</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="history.back()">Annuler</button>
+                <button type="submit" class="btn-primary">Créer la discussion</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

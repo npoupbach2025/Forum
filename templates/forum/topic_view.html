@@ -1,0 +1,176 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="topic-container">
+    <div class="topic-header">
+        <h1>{{ topic.title }}</h1>
+        <div class="topic-meta">
+            <span>Par {{ topic.author.username }}</span>
+            <span>{{ topic.created_at|timesince }}</span>
+            {% if topic.is_private %}
+                <span class="private-badge">Privé</span>
+            {% endif %}
+            {% if user == topic.author %}
+                <div class="topic-actions">
+                    <button onclick="editMessage({{ topic.id }}, 'topic')" class="edit-btn">
+                        Modifier
+                    </button>
+                    <button onclick="deleteMessage({{ topic.id }}, 'topic')" class="delete-btn">
+                        Supprimer
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="topic-content">
+        {{ topic.content|linebreaks }}
+    </div>
+
+    <div class="comments-section">
+        <h2>Réponses</h2>
+        {% for comment in comments %}
+            <div class="comment" id="comment-{{ comment.id }}">
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <img src="{% if comment.author.profile.avatar %}{{ comment.author.profile.avatar.url }}{% else %}{% static 'forum/img/default_avatar.png' %}{% endif %}" 
+                             alt="{{ comment.author.username }}" 
+                             class="comment-avatar">
+                        <span>{{ comment.author.username }}</span>
+                    </div>
+                    <div class="comment-actions">
+                        <span class="comment-date">{{ comment.created_at|timesince }}</span>
+                        {% if user == comment.author %}
+                            <button onclick="editMessage({{ comment.id }}, 'comment')" class="edit-btn">
+                                Modifier
+                            </button>
+                            <button onclick="deleteMessage({{ comment.id }}, 'comment')" class="delete-btn">
+                                Supprimer
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="comment-content">
+                    {{ comment.content|linebreaks }}
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+            <form method="post" class="comment-form" action="{% url 'forum:reply_topic' topic.id %}">
+                {% csrf_token %}
+                <textarea name="content" placeholder="Votre réponse..." required></textarea>
+                <button type="submit">Répondre</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function editMessage(id, type) {
+    const element = type === 'topic' ? document.querySelector('.topic-content') : document.querySelector(`#comment-${id} .comment-content`);
+    const content = element.textContent.trim();
+    const textarea = document.createElement('textarea');
+    textarea.value = content;
+    element.innerHTML = '';
+    element.appendChild(textarea);
+    
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Enregistrer';
+    saveButton.onclick = async () => {
+        const newContent = textarea.value;
+        const url = type === 'topic' ? `/topic/${id}/edit/` : `/comment/${id}/edit/`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `content=${encodeURIComponent(newContent)}`
+            });
+            
+            if (response.ok) {
+                element.innerHTML = newContent.replace(/\n/g, '<br>');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la modification:', error);
+        }
+    };
+    
+    element.appendChild(saveButton);
+}
+
+function deleteMessage(id, type) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+        const url = type === 'topic' ? `/topic/${id}/delete/` : `/comment/${id}/delete/`;
+        window.location.href = url;
+    }
+}
+</script>
+
+<style>
+.topic-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.topic-actions,
+.comment-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.edit-btn,
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+.edit-btn:hover {
+    color: var(--primary);
+}
+
+.delete-btn:hover {
+    color: #dc3545;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid var(--surface);
+    border-radius: var(--radius);
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--primary-dark);
+}
+</style>
+{% endblock %}

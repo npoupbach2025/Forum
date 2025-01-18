@@ -1,0 +1,107 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/moderation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mod-container">
+    <div class="mod-sidebar">
+        <h2>Modération</h2>
+        <nav class="mod-nav">
+            <a href="{% url 'forum:admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Tableau de bord
+            </a>
+            <a href="{% url 'forum:mod_users' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_users' %}active{% endif %}">
+                <i class="fas fa-users"></i> Utilisateurs
+            </a>
+            <a href="{% url 'forum:mod_topics' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_topics' %}active{% endif %}">
+                <i class="fas fa-comments"></i> Discussions
+            </a>
+            <a href="{% url 'forum:mod_reports' %}" class="nav-link {% if request.resolver_match.url_name == 'mod_reports' %}active{% endif %}">
+                <i class="fas fa-flag"></i> Signalements
+            </a>
+        </nav>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="mod-content">
+        <div class="content-header">
+            <h1>Gestion des Signalements</h1>
+            
+            <!-- Filtres -->
+            <div class="filters-bar">
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">Tous les statuts</option>
+                    <option value="pending">En attente</option>
+                    <option value="resolved">Résolus</option>
+                    <option value="dismissed">Rejetés</option>
+                </select>
+                
+                <select id="typeFilter" class="filter-select">
+                    <option value="all">Tous les types</option>
+                    <option value="message">Messages</option>
+                    <option value="topic">Discussions</option>
+                    <option value="user">Utilisateurs</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Liste des signalements -->
+        <div class="reports-list">
+            {% if reports %}
+                {% for report in reports %}
+                <div class="report-card {% if report.status == 'pending' %}pending{% elif report.status == 'resolved' %}resolved{% else %}dismissed{% endif %}">
+                    <div class="report-header">
+                        <h3>Signalement #{{ report.id }}</h3>
+                        <span class="report-status {{ report.status }}">
+                            {% if report.status == 'pending' %}En attente
+                            {% elif report.status == 'resolved' %}Résolu
+                            {% else %}Rejeté{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="report-details">
+                        <p><strong>Discussion :</strong> <a href="{% url 'forum:topic_view' report.topic.id %}">{{ report.topic.title }}</a></p>
+                        <p><strong>Signalé par :</strong> {{ report.reporter.username }}</p>
+                        <p><strong>Raison :</strong> {{ report.get_reason_display }}</p>
+                        {% if report.details %}
+                        <p><strong>Détails :</strong> {{ report.details }}</p>
+                        {% endif %}
+                        <p><strong>Date :</strong> {{ report.created_at|date:"d/m/Y H:i" }}</p>
+                        
+                        {% if report.handled_by %}
+                        <p><strong>Traité par :</strong> {{ report.handled_by.username }} le {{ report.handled_at|date:"d/m/Y H:i" }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if report.status == 'pending' %}
+                    <div class="report-actions">
+                        <form method="POST" action="{% url 'forum:handle_report' report.id %}" class="inline-form">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="resolve" class="btn btn-success">
+                                <i class="fas fa-check"></i> Résoudre
+                            </button>
+                            <button type="submit" name="action" value="dismiss" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Rejeter
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-reports">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Aucun signalement à traiter pour le moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'forum/js/moderation-reports.js' %}"></script>
+{% endblock %}

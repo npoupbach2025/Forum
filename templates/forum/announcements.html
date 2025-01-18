@@ -1,0 +1,91 @@
+{% extends "forum/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'forum/css/announcements.css' %}">
+<div class="announcements-container">
+    <h1 class="page-title">Page des Annonces</h1>
+    <div class="announcements-list">
+        {% for item in news %}
+            <div class="announcement-item">
+                <h2 class="announcement-title">{{ item.title }}</h2>
+                {% if item.type == "article" %}
+                    <p class="announcement-content">{{ item.content }}</p>
+                {% elif item.type == "video" %}
+                    <iframe class="announcement-video" width="560" height="315" src="{{ item.content }}" frameborder="0" allowfullscreen></iframe>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <section class="statistics">
+        <h2 class="section-title">5 Chiffres Clés à Connaître</h2>
+        <ul class="statistics-list">
+            <li><strong>210 jours</strong> : Délai moyen pour identifier une violation de données en France.</li>
+            <li><strong>1,23 millions de dollars</strong> : Coût moyen d'une violation de données pour une entreprise.</li>
+            <li><strong>35 000 DPO</strong> : Recrutés ou désignés en France depuis l'entrée en vigueur du RGPD.</li>
+            <li><strong>100%</strong> : Applications bancaires vulnérables aux attaques.</li>
+            <li><strong>37%</strong> : Entreprises mondiales identifient le risque cyber comme priorité.</li>
+        </ul>
+    </section>
+
+    <section class="resources">
+        <h2 class="section-title">Ressources Clés</h2>
+        <div class="resources-grid">
+            <div class="resource">
+                <h3 class="resource-title">Kit de sensibilisation aux risques numériques</h3>
+                <p class="resource-description">Un ensemble complet de fiches pratiques, affiches, et quiz pour sensibiliser sur les risques numériques.</p>
+                <a class="resource-link" href="https://www.cybermalveillance.gouv.fr/tous-nos-contenus/kit-de-sensibilisation" target="_blank">Accéder au kit</a>
+            </div>
+
+            <div class="resource">
+                <h3 class="resource-title">Les 10 mesures essentielles</h3>
+                <p class="resource-description">Adoptez des bonnes pratiques comme l'utilisation de mots de passe solides et les sauvegardes régulières.</p>
+                <a class="resource-link" href="https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/10-mesures-essentielles-assurer-securite-numerique" target="_blank">Découvrir les mesures</a>
+            </div>
+
+            <div class="resource">
+                <h3 class="resource-title">Programme d'e-sensibilisation</h3>
+                <p class="resource-description">Apprenez et testez vos connaissances sur les cyberattaques et les bonnes pratiques.</p>
+                <a class="resource-link" href="https://www.cybermalveillance.gouv.fr/sens-cyber/apprendre" target="_blank">Participer au programme</a>
+            </div>
+
+            <div class="resource">
+                <h3 class="resource-title">Attention aux arnaques iCloud</h3>
+                <p class="resource-description">Ne vous laissez pas duper par des messages frauduleux sur l'espace saturé de votre compte iCloud.</p>
+                <a class="resource-link" href="https://www.zataz.com/attention-aux-arnaques-icloud-quand-les-pirates-visent-vos-photos-de-vacances" target="_blank">Lire l'article</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="links">
+        <h2 class="section-title">Liens Utiles</h2>
+        <ul class="links-list">
+            <li><a class="link-item" href="https://www.cert.ssi.gouv.fr" target="_blank">CERT-FR (Centre de veille en cybersécurité)</a></li>
+            <li><a class="link-item" href="https://www.ssi.gouv.fr" target="_blank">ANSSI (Agence Nationale de la Sécurité des Systèmes d'Information)</a></li>
+            <li><a class="link-item" href="https://www.cybermalveillance.gouv.fr" target="_blank">Cybermalveillance.gouv.fr</a></li>
+            <li><a class="link-item" href="https://www.zataz.com" target="_blank">ZATAZ</a></li>
+            <li><a class="link-item" href="https://www.lemondeinformatique.fr" target="_blank">Le Monde Informatique</a></li>
+        </ul>
+    </section>
+
+    <section class="images">
+        <h2 class="section-title">Illustrations de Sensibilisation à la Cybersécurité</h2>
+        <div class="image-gallery">
+            <div class="image-item">
+                <img class="illustration" src="https://static.vecteezy.com/ti/vecteur-libre/p1/11848877-infographie-de-sensibilisation-a-la-cybersecurite-vectoriel.jpg" alt="Affiche de sensibilisation à la cybersécurité">
+                <p class="illustration-caption">Affiche de sensibilisation à la cybersécurité</p>
+            </div>
+            <div class="image-item">
+                <img class="illustration" src="https://cybel.cnpp.com/static/vign/Affiche-securite-information.jpg" alt="Affiche sur les bons réflexes de la cybersécurité">
+                <p class="illustration-caption">Affiche sur les bons réflexes de la cybersécurité</p>
+            </div>
+            <div class="image-item">
+                <img class="illustration" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaWDBVovwIpiD1G3fapaIZORh70otcSsTKhQ&s" alt="Affiche de sensibilisation à la cybersécurité en entreprise">
+                <p class="illustration-caption">Affiche de sensibilisation à la cybersécurité en entreprise</p>
+            </div>
+        </div>
+    </section>
+    
+</div>
+{% endblock %}

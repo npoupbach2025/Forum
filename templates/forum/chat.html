@@ -1,0 +1,34 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>{{ topic.title }}</h2>
+        <p>Discussion avec {{ topic.with_friend.user.username }}</p>
+    </div>
+
+    <div id="chat-messages" class="chat-messages">
+        {% for message in messages %}
+            <div class="message {% if message.author == request.user %}sent{% else %}received{% endif %}">
+                <div class="message-content">
+                    {{ message.content }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="chat-input">
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="content" placeholder="Votre message...">
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+</div>
+<script src="{% static 'forum/js/chat.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'forum/css/chat.css' %}">
+{% endblock %}

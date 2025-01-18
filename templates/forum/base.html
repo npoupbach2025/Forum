@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum de Discussion</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'forum/css/category.css' %}">
+    <link rel="stylesheet" href="{% static 'forum/css/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'forum/css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app">
+        {% if request.resolver_match.url_name != 'register' %}
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h1>Forum de Discussion</h1>
+                    <a href="{% url 'forum:home' %}" class="home-button">Accueil</a>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="user-panel">
+                    <div class="user-info">
+                        <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'forum/img/default_avatar.svg' %}{% endif %}" alt="Avatar" class="user-avatar">
+                        <div class="user-details">
+                            <div class="username">{{ user.username }}</div>
+                            <div class="user-id">#{{ user.profile.forum_id }}</div>
+                        </div>
+                        <div class="user-actions">
+                            <a href="{% url 'forum:profile' user.username %}" class="action-icon">
+                                <i class="fas fa-user"></i>
+                            </a>
+                            <a href="{% url 'forum:logout' %}" class="action-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="sidebar-channels">
+                    <div class="stats-panel">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span>{{ online_users_count }} en ligne</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-comments"></i>
+                            <span>{{ total_topics_count }} discussions</span>
+                        </div>
+                    </div>
+                    {% if request.resolver_match.url_name == 'category' %}
+                        <div class="channel-category">
+                            <span>CATÉGORIES</span>
+                            <div class="channel">
+                                <a href="{% url 'forum:category' 'technologies' %}">Technologies</a>
+                            </div>
+                            <div class="channel">
+                                <a href="{% url 'forum:category' 'gaming' %}">Gaming</a>
+                            </div>
+                            <div class="channel">
+                                <a href="{% url 'forum:category' 'art' %}">Art & Créations</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% if request.resolver_match.url_name != 'register' %}
+            <div class="members-sidebar">
+                <div class="friend-requests">
+                    <h3>DEMANDES D'AMI</h3>
+                    {% with pending_requests=user.profile.received_requests.all %}
+                        {% for request in pending_requests %}
+                            {% if request.status == 'pending' %}
+                                <div class="friend-request">
+                                    <div class="request-info">
+                                        <span>#{{ request.from_user.forum_id }}</span>
+                                        <span>{{ request.from_user.user.username }}</span>
+                                    </div>
+                                    <div class="request-actions">
+                                        <form action="{% url 'forum:handle_friend_request' request.id %}" method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="accept">
+                                            <button type="submit" class="accept-btn" title="Accepter">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{% url 'forum:handle_friend_request' request.id %}" method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="reject-btn" title="Refuser">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Modals -->
+    <div id="topicModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Nouvelle discussion</h2>
+            <form method="POST" action="{% url 'forum:create_topic' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="title" placeholder="Titre de la discussion" required>
+                </div>
+                <div class="input-group">
+                    <select name="friend" required>
+                        <option value="">Sélectionner un ami</option>
+                        {% for friend in user.profile.friends.all %}
+                            <option value="{{ friend.id }}">{{ friend.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit">Créer la discussion</button>
+            </form>
+        </div>
+    </div>
+    <div id="privateTopicModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Créer un forum privé</h2>
+            
+            <form method="POST" action="{% url 'forum:create_private_topic' %}" id="privateTopicForm">
+                {% csrf_token %}
+                
+                <div class="input-group">
+                    <label for="privateTopic-title">Titre du forum</label>
+                    <input type="text" id="privateTopic-title" name="title" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="privateTopic-description">Description</label>
+                    <textarea id="privateTopic-description" name="description" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Type d'accès</label>
+                    <select name="access_type" id="access-type">
+                        <option value="invite">Sur invitation uniquement</option>
+                        <option value="password">Protégé par mot de passe</option>
+                    </select>
+                </div>
+
+                <div class="input-group password-section" style="display: none;">
+                    <label for="forum-password">Mot de passe</label>
+                    <input type="password" id="forum-password" name="password">
+                </div>
+
+                <div class="input-group">
+                    <label>Sélectionner des amis</label>
+                    <div class="friends-list">
+                        {% for friend in user.profile.friends.all %}
+                        <div class="friend-item">
+                            <input type="checkbox" name="friends[]" value="{{ friend.id }}" id="friend-{{ friend.id }}">
+                            <label for="friend-{{ friend.id }}">
+                                {{ friend.user.username }} (#{{ friend.forum_id }})
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Créer le forum privé</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="friendModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ajouter un ami</h2>
+            <form method="POST" action="{% url 'forum:add_friend' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="number" name="friend_id" placeholder="Numéro d'utilisateur" required>
+                </div>
+                <button type="submit">Envoyer la demande</button>
+            </form>
+        </div>
+    </div>
+
+    {% block extra_modals %}{% endblock %}
+
+    <!-- Scripts -->
+    <script src="{% static 'forum/js/notifications.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le gestionnaire de notifications
+            if (window.notificationManager) {
+                // Écouter les réponses AJAX pour les notifications
+                const originalFetch = window.fetch;
+                window.fetch = function() {
+                    return originalFetch.apply(this, arguments)
+                        .then(async response => {
+                            const clone = response.clone();
+                            try {
+                                const data = await clone.json();
+                                if (data.notification) {
+                                    window.notificationManager.notify(
+                                        data.notification.title,
+                                        { body: data.notification.body }
+                                    );
+                                }
+                            } catch (e) {
+                                // Pas de notification dans cette réponse
+                            }
+                            return response;
+                        });
+                };
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser le gestionnaire de notifications
+            if (!window.notificationManager) {
+                window.notificationManager = new NotificationManager();
+            }
+
+            // Modal pour nouvelle discussion
+            const modal = document.getElementById('topicModal');
+            const btn = document.getElementById('newTopicBtn');
+            const span = document.getElementsByClassName('close')[0];
+            
+            if (btn) {
+                btn.onclick = function() {
+                    modal.style.display = 'block';
+                }
+            }
+            
+            if (span) {
+                span.onclick = function() {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // Gérer la soumission du formulaire de création de discussion
+            const createTopicForm = document.querySelector('form[action*="create_topic"]');
+            if (createTopicForm) {
+                createTopicForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Envoyer la notification
+                            if (window.notificationManager) {
+                                window.notificationManager.notifyNewTopic(
+                                    data.topic.author,
+                                    data.topic.title,
+                                    data.topic.is_private
+                                );
+                            }
+                            // Rediriger vers la nouvelle discussion
+                            window.location.href = data.redirect_url;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+
+            // Supprimer les discussions privées
+            const deleteButtons = document.querySelectorAll('.delete-chat');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const chatId = this.dataset.chatId;
+                    if (confirm('Voulez-vous vraiment supprimer cette conversation ?')) {
+                        fetch(`/delete_chat/${chatId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                this.closest('.channel').remove();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <style>
+        .online-status {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .online-label {
+            color: var(--text-muted);
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .online-users-list {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .online-user {
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface-alt);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .online-user a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .online-user a:hover {
+            color: var(--primary);
+        }
+
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

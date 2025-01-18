@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum de Discussion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #5865F2;
+            --primary-dark: #4752C4;
+            --background: #313338;
+            --surface: #2B2D31;
+            --surface-alt: #232428;
+            --text: #DCDDDE;
+            --text-muted: #9CA3AF;
+            --radius: 8px;
+            --header-height: 48px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 14px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+            gap: 0.75rem;
+            border-right: 1px solid var(--surface-alt);
+            overflow-y: scroll;
+        }
+
+        .sidebar-section {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        /* Navigation */
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            margin: 0.2rem 0;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .nav-link i, .activity-icon i {
+            font-size: 1.4rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--background);
+            padding: 1.5rem;
+            overflow-y: scroll;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .welcome-hero {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+            border-radius: var(--radius);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-hero h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .create-topic-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-topic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        }
+
+        .create-topic-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Activities */
+        .activities-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            flex-shrink: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            background: var(--surface-alt);
+        }
+
+        .activity-icon {
+            font-size: 1.2rem;
+            color: var(--primary);
+            width: 24px;
+            text-align: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-user {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .activity-user:hover {
+            text-decoration: underline;
+        }
+
+        .activity-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+
+        .activity-link:hover {
+            color: var(--primary);
+        }
+
+        .activity-time {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .no-activities {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+
+        /* User Panel */
+        .user-panel {
+            margin-top: auto;
+            background: var(--surface-alt);
+            padding: 1rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .user-info-link:hover .user-name {
+            color: var(--primary);
+        }
+
+        .user-info-link:hover .user-avatar {
+            transform: scale(1.05);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-status {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            min-width: 150px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(88, 101, 242, 0.1);
+            border-radius: 50%;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .text-success {
+            color: #4CAF50;
+        }
+
+        /* Recent Activity */
+        .recent-activities {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .recent-activities h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            background: var(--surface-light);
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-header {
+            margin-bottom: 0.25rem;
+        }
+
+        .user-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .user-link:hover {
+            text-decoration: underline;
+        }
+
+        .activity-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .no-activity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            padding: 1rem;
+            background: var(--surface-light);
+            border-radius: var(--radius);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            padding: 1rem;
+            background: var(--surface);
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--surface-alt);
+        }
+
+        /* Messages Privés */
+        .private-messages-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            flex-shrink: 0;
+        }
+
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            transition: transform 0.2s;
+        }
+
+        .message-item:hover {
+            transform: translateX(5px);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .message-time {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .message-preview {
+            color: var(--text-muted);
+        }
+
+        /* Profils */
+        .profiles-section {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            flex-shrink: 0;
+        }
+
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            transition: transform 0.2s;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-name:hover {
+            color: var(--primary);
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .online-status {
+            color: #43b581;
+            font-size: 0.75rem;
+        }
+
+        .offline-status {
+            color: #747f8d;
+            font-size: 0.75rem;
+        }
+
+        .no-messages, .no-profiles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            padding: 2rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: var(--radius);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--text);
+        }
+
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: var(--surface-alt);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            color: var(--text);
+        }
+
+        .modal button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+
+        .modal button[type="submit"]:hover {
+            background: var(--primary-dark);
+        }
+
+        .online-users {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            margin-top: 0.5rem;
+        }
+        
+        .online-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .users-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .online-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .user-id {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .forum-stats {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+        
+        .forum-stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface-alt);
+            border-radius: var(--radius);
+            min-width: 150px;
+        }
+        
+        .forum-stats .stat-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(88, 101, 242, 0.1);
+            border-radius: 50%;
+        }
+        
+        .forum-stats .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .forum-stats .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .forum-stats .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar gauche -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <h1>Forum</h1>
+                    <div class="online-users">
+                        <div class="online-count">
+                            <i class="fas fa-circle text-success"></i>
+                            {{ online_count }} utilisateur{{ online_count|pluralize }} en ligne
+                        </div>
+                        {% if online_users %}
+                        <div class="users-list">
+                            {% for online_user in online_users %}
+                            <div class="online-user">
+                                <img src="{% static 'forum/img/avatar.png' %}" alt="Avatar" class="user-avatar">
+                                <span class="username">{{ online_user.username }}</span>
+                                <span class="user-id">#{{ online_user.id }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Catégories</div>
+                <a href="{% url 'forum:category' 'Technologies' %}" class="nav-link">
+                    <i class="fas fa-microchip"></i>
+                    Technologies
+                </a>
+                <a href="{% url 'forum:category' 'Gaming' %}" class="nav-link">
+                    <i class="fas fa-gamepad"></i>
+                    Gaming
+                </a>
+                <a href="{% url 'forum:category' 'Art & Créations' %}" class="nav-link">
+                    <i class="fas fa-paint-brush"></i>
+                    Art & Créations
+                </a>
+            </div>
+
+            <nav class="nav-section">
+                <span class="nav-title">Général</span>
+                <a href="/announcements" class="nav-link">
+                    <i class="fas fa-bullhorn"></i>
+                    Annonces
+                    <span class="badge"></span>
+                </a>
+                <a href="/rules" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    Règles
+                </a>
+                
+                {% if user.is_superuser %}
+                <span class="nav-title">Administration</span>
+                <a href="{% url 'forum:admin_dashboard' %}" class="nav-link">
+                    <i class="fas fa-shield-alt"></i>
+                    Tableau de bord
+                </a>
+                {% endif %}
+            </nav>
+
+            {% if user.is_authenticated %}
+            <div class="user-panel">
+                <a href="{% url 'forum:profile' user.username %}" class="user-info-link">
+                    <img src="/static/forum/img/avatar.png" alt="Avatar" class="user-avatar">
+                    <div class="user-info">
+                        {% if user.is_authenticated %}
+                            <span class="username">{{ user.username }}</span>
+                            <span class="user-id">#{{ user.id }}</span>
+                            <span class="online-status">
+                                <i class="fas fa-circle text-success"></i>
+                                En ligne
+                            </span>
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="user-actions">
+                    <button class="action-btn" onclick="document.getElementById('friendModal').style.display='block'" title="Ajouter un ami">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                    <a href="{% url 'forum:logout' %}" class="action-btn" title="Déconnexion">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <div class="welcome-hero">
+                <h1>Bienvenue sur le Forum</h1>
+                <p>Un espace d'échange et de partage pour toute la communauté</p>
+                {% if user.is_authenticated %}
+                <div class="hero-actions">
+                    <a href="{% url 'forum:create_topic' %}" class="create-topic-btn" onclick="openNewChatModal(event)">
+                        <i class="fas fa-plus"></i>
+                        Créer une discussion
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="forum-stats">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ total_members }}</span>
+                        <span class="stat-label">Membres</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-comments"></i>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ total_discussions }}</span>
+                        <span class="stat-label">Discussions</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-circle text-success"></i>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ online_count }}</span>
+                        <span class="stat-label">En ligne</span>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="activities-section">
+                <h2>Activités récentes</h2>
+                <div class="activities-list">
+                    {% for activity in activities %}
+                    <div class="activity-item">
+                        <div class="activity-avatar">
+                            <img src="{% static 'forum/img/default_avatar.svg' %}" alt="{{ activity.user.username }}" class="avatar">
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-header">
+                                <span class="activity-author">{{ activity.user.username }}</span>
+                                <span class="activity-message">{{ activity.message }}</span>
+                            </div>
+                            <div class="activity-footer">
+                                <span class="activity-time">{{ activity.created_at|timesince }}</span>
+                                {% if activity.link %}
+                                <a href="{{ activity.link }}" class="activity-link">Voir la discussion</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="no-activities">Aucune activité récente</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Section Messages Privés -->
+            <div class="private-messages-section">
+                <h2 class="section-title"><i class="fas fa-envelope"></i> Messages Privés</h2>
+                <div class="messages-list">
+                    {% for message in private_messages %}
+                        <div class="message-item">
+                            <div class="message-avatar">
+                                <img src="{% if message.sender.profile.avatar %}{{ message.sender.profile.avatar.url }}{% else %}{% static 'forum/img/avatar.png' %}{% endif %}" 
+                                     alt="{{ message.sender.username }}" class="user-avatar">
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">{{ message.sender.username }}</span>
+                                    <span class="message-time">{{ message.created_at|timesince }}</span>
+                                </div>
+                                <div class="message-preview">{{ message.content|truncatechars:50 }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="no-messages">
+                            <i class="fas fa-inbox"></i>
+                            Aucun message privé
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Section Profils -->
+            <div class="profiles-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> Membres Actifs</h2>
+                <div class="profiles-grid">
+                    {% for profile in active_profiles %}
+                        <div class="profile-card">
+                            <div class="profile-avatar">
+                                <img src="{% if profile.avatar %}{{ profile.avatar.url }}{% else %}{% static 'forum/img/avatar.png' %}{% endif %}" 
+                                     alt="{{ profile.user.username }}" class="user-avatar">
+                            </div>
+                            <div class="profile-info">
+                                <a href="{% url 'forum:profile' profile.user.username %}" class="profile-name">
+                                    {{ profile.user.username }}
+                                </a>
+                                <span class="profile-status">
+                                    {% if profile.is_online %}
+                                        <i class="fas fa-circle online-status"></i> En ligne
+                                    {% else %}
+                                        <i class="fas fa-circle offline-status"></i> Hors ligne
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="no-profiles">
+                            <i class="fas fa-users-slash"></i>
+                            Aucun membre actif
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="footer">
+                <p>&copy; 2023 Forum de Discussion</p>
+            </div>
+        </main>
+        <div id="topicModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Nouvelle discussion</h2>
+                <form method="POST" action="{% url 'forum:create_topic' %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="title" placeholder="Titre de la discussion" required>
+                    </div>
+                    <div class="input-group">
+                        <select name="friend" required>
+                            <option value="">Sélectionner un ami</option>
+                            {% for friend in friends %}
+                                <option value="{{ friend.id }}">{{ friend.user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit">Créer la discussion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="friendModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ajouter un ami</h2>
+            <form method="POST" action="{% url 'forum:add_friend' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="number" name="friend_id" placeholder="Numéro d'utilisateur" required>
+                </div>
+                <button type="submit">Envoyer la demande</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupérer le modal et les éléments de contrôle
+            const modal = document.getElementById('topicModal');
+            const closeBtn = modal.querySelector('.close');
+            const modalForm = modal.querySelector('form');
+            const friendModal = document.getElementById('friendModal');
+            const friendModalClose = friendModal.querySelector('.close');
+        
+            // Fonction pour ouvrir le modal
+            window.openNewChatModal = function(event) {
+                event.preventDefault();
+                modal.style.display = 'block';
+            }
+        
+            // Fermer quand on clique sur le X
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+        
+            // Fermer quand on clique en dehors du modal
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+                if (event.target == friendModal) {
+                    friendModal.style.display = 'none';
+                }
+            }
+        
+            // Gérer la soumission du formulaire
+            if (modalForm) {
+                modalForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    try {
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            modal.style.display = 'none';
+                            window.location.href = `/chat/${data.chat_id}`;
+                        } else {
+                            alert(data.error || 'Une erreur est survenue');
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        alert('Une erreur est survenue');
+                    }
+                });
+            }
+        });
+        </script>          
+</body>
+</html>
